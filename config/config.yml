@@ -1,0 +1,4 @@
+data_ingestion:
+  root_dir: data
+  urls: ['https://contenido.bce.fin.ec/documentos/informacioneconomica/indicadores/real/PrecioPetroleoCrudoEcuatoriano.html',
+        'https://contenido.bce.fin.ec/documentos/informacioneconomica/indicadores/real/Inflacion.html']
