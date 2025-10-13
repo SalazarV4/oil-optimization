@@ -17,6 +17,7 @@ dependencies = [
     "tabula-py (>=2.10.0,<3.0.0)",
     "yfinance (>=0.2.66,<0.3.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
+    "python-dotenv (>=1.1.1,<2.0.0)",
 ]
 
 
