@@ -1,13 +1,8 @@
 data_ingestion:
   root_dir: data
-  macro_indicators_urls:
-  - 'https://contenido.bce.fin.ec/documentos/informacioneconomica/indicadores/real/PrecioPetroleoCrudoEcuatoriano.html'
-  - 'https://contenido.bce.fin.ec/documentos/informacioneconomica/indicadores/real/Inflacion.html'
-  api_endpoint:
+  eia_api_endpoint:
   - 'https://api.eia.gov/v2/crude-oil-imports/data'
   - 'https://api.eia.gov/v2/petroleum/pri/spt/data'
-  oil_reports_url:
-  - 'https://contenido.bce.fin.ec/documentos/Estadisticas/Hidrocarburos/SerieCifrasPetroleras.xlsx'
   yfinance:
     ticker: '^GSPE'
     start_date: '2015-01-01'
