@@ -66,3 +66,19 @@ eia_api:
       sort[0][column]: period
       sort[0][direction]: asc
       data[0]: value
+fred_api:
+  us_dollar_index: 
+    series_id: DTWEXBGS
+    api_key: null
+    file_type: json
+    observation_start: '2015-01-01'
+  volatility_index:
+    series_id: VIXCLS
+    api_key: null
+    file_type: json
+    observation_start: '2015-01-01'
+  cpi_energy:
+    series_id: CPIENGSL
+    api_key: null
+    file_type: json
+    observation_start: '2015-01-01'
