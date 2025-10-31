@@ -90,5 +90,5 @@ if __name__ == '__main__':
         params_dict['api_key'] = FRED_API_KEY
         fred_json = fred_extractor.make_request(url=fred_extractor.url, payload=params_dict)
         fred_data = fred_extractor.extract_data(fred_json)
-        dataframe = pd.DataFrame(fred_data)
+        dataframe = pd.DataFrame(fred_data).rename({'date':'period'},axis=1) # Change of date name from 'date' to 'period'
         fred_extractor.save_to_csv(dataframe, key)
