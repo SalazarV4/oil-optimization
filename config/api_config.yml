@@ -4,7 +4,7 @@ eia_api:
     payload: 
       api_key: null
       facets[product][]: EPCWTI
-      start: '2015-01-01'
+      start: '2014-12-26'
       sort[0][column]: period
       sort[0][direction]: asc
       frequency: daily
@@ -62,12 +62,12 @@ fred_api:
     series_id: DTWEXBGS
     api_key: null
     file_type: json
-    observation_start: '2015-01-01'
+    observation_start: '2014-12-29'
   volatility_index:
     series_id: VIXCLS
     api_key: null
     file_type: json
-    observation_start: '2015-01-01'
+    observation_start: '2014-12-29'
   cpi_energy:
     series_id: CPIENGSL
     api_key: null

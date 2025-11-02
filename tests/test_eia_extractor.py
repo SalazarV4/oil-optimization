@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 import pandas as pd
 from oil_optimization.utils.io_helpers import save_csv
-from oil_optimization.data_extractor.eia_extractor import EIAExtractor
+from oil_optimization.data_pipeline.extractor import EIAExtractor
 
 def test_save_csv():
     with TemporaryDirectory() as tmp_dir:
