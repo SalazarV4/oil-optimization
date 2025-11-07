@@ -1,13 +1,14 @@
 import os
+from functools import wraps
 from datetime import timedelta
-from typing import Dict, Tuple
+from typing import Dict
 import pandas as pd
 from oil_optimization.utils.io_helpers import read_yaml
 
 def load_dataframes() -> Dict[str,pd.DataFrame]:
     """
     Defines a dictionary that will contain all
-    data extracted from the APIs
+    files extracted from the APIs as pandas dataframes
     """
 
     config = read_yaml('config/config.yml')
@@ -27,17 +28,18 @@ def load_dataframes() -> Dict[str,pd.DataFrame]:
 
 def merge_dataframe(processing_func):
     """
-    
+    Decorator to add merge functionality after each call to a processing function
     """
+    @wraps(processing_func)
     def wrapper(main_df: pd.DataFrame, 
                 feature_df: pd.DataFrame,
                 out_label: str | None = None
                 ) -> pd.DataFrame:
-        """
-        
-        """
-        processed_df = processing_func(feature_df)
 
+        if processing_func.__name__ == 'monthly_merge':
+            processed_df = processing_func(main_df, feature_df)
+        else:
+            processed_df = processing_func(feature_df)
 
         out_df = main_df.merge(processed_df,
                            on='period',
@@ -57,13 +59,34 @@ def merge_dataframe(processing_func):
 
 def process_gasoline(gasoline_df: pd.DataFrame) -> pd.DataFrame:
     """
-    
+    Processor for gasoline
+
+    Parameters
+    ----------
+    gasoline_df: pd.DataFrame
+        Dataframe containing gasoline pricing
+
+    Returns
+    -------
+    pd.DataFrame
     """
+
     gasoline_df_agg = gasoline_df.groupby('period')['value'].mean().reset_index()
 
     gasoline_df_agg['period'] = gasoline_df_agg['period'] - timedelta(3)
 
     return gasoline_df_agg
+
+def process_production(prod_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    
+    """
+    prod_df_filter = prod_df[prod_df['units'] == 'MBBL']
+    df_prod_sum = prod_df_filter.groupby('period')['value'].sum().reset_index()
+
+    df_prod_sum['year_month'] = df_prod_sum['period'].dt.strftime('%Y-%m')
+
+    return df_prod_sum
 
 @merge_dataframe
 def process_imports_exports(feature_df: pd.DataFrame) -> pd.DataFrame:
@@ -108,6 +131,7 @@ def process_index(feature_df: pd.DataFrame,
 
     return df_didx
 
+@merge_dataframe
 def monthly_merge(main_df: pd.DataFrame,
                   feature_df: pd.DataFrame
                   ) -> pd.DataFrame:
