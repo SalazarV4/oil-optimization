@@ -1,6 +1,6 @@
 import os
+from datetime import date, timedelta
 from functools import wraps
-from datetime import timedelta
 from typing import Dict
 import pandas as pd
 from oil_optimization.utils.io_helpers import read_yaml
@@ -31,7 +31,7 @@ def merge_dataframe(processing_func):
     Decorator to add merge functionality after each call to a processing function
     """
     @wraps(processing_func)
-    def wrapper(main_df: pd.DataFrame, 
+    def wrapper(main_df: pd.DataFrame,
                 feature_df: pd.DataFrame,
                 out_label: str | None = None
                 ) -> pd.DataFrame:
@@ -57,7 +57,8 @@ def merge_dataframe(processing_func):
 
     return wrapper
 
-def process_gasoline(gasoline_df: pd.DataFrame) -> pd.DataFrame:
+def process_gasoline(gasoline_df: pd.DataFrame,
+                     groups: list[str] | None = None) -> pd.DataFrame:
     """
     Processor for gasoline
 
@@ -70,8 +71,12 @@ def process_gasoline(gasoline_df: pd.DataFrame) -> pd.DataFrame:
     -------
     pd.DataFrame
     """
+    gasoline_df_copy = gasoline_df.copy()
 
-    gasoline_df_agg = gasoline_df.groupby('period')['value'].mean().reset_index()
+    if groups:
+        gasoline_df_copy = gasoline_df_copy[gasoline_df_copy['area-name'].isin(groups)]
+
+    gasoline_df_agg = gasoline_df_copy.groupby('period')['value'].mean().reset_index()
 
     gasoline_df_agg['period'] = gasoline_df_agg['period'] - timedelta(3)
 
@@ -160,3 +165,23 @@ def monthly_merge(main_df: pd.DataFrame,
                                     suffixes=('','_y'))
 
     return merge_feature
+
+@merge_dataframe
+def process_wti_price(feature_df: pd.DataFrame) -> pd.DataFrame:
+
+    weekly_timestamps_df = pd.DataFrame()
+    today = date.today().strftime('%Y-%m-%d')
+    #Define base DataFrame
+    weekly_timestamps_df['period'] =  pd.date_range(start='2015-01-02',
+                                        end=today,freq='W') - timedelta(days=2)
+
+    feature_df_copy = feature_df.copy()
+    feature_df_copy = feature_df_copy[['period','value']]
+
+    feature_df_copy['value'] = feature_df_copy['value'].rolling(window=5).mean()
+
+    merge_df = weekly_timestamps_df.merge(feature_df_copy, on='period',how='outer')
+    merge_wti = weekly_timestamps_df.merge(merge_df,how='right')
+    merge_wti['value'] = merge_wti['value'].ffill()
+
+    return merge_wti
