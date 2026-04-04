@@ -57,8 +57,7 @@ def merge_dataframe(processing_func):
 
     return wrapper
 
-def process_gasoline(gasoline_df: pd.DataFrame,
-                     groups: list[str] | None = None) -> pd.DataFrame:
+def process_gasoline(feature_df: pd.DataFrame) -> pd.DataFrame:
     """
     Processor for gasoline
 
@@ -71,22 +70,19 @@ def process_gasoline(gasoline_df: pd.DataFrame,
     -------
     pd.DataFrame
     """
-    gasoline_df_copy = gasoline_df.copy()
+    gasoline_df_copy = feature_df.copy()
 
-    if groups:
-        gasoline_df_copy = gasoline_df_copy[gasoline_df_copy['area-name'].isin(groups)]
+    gasoline_df = gasoline_df_copy[gasoline_df_copy['area-name'].eq('U.S.')][['period','value']].reset_index(drop=True)
 
-    gasoline_df_agg = gasoline_df_copy.groupby('period')['value'].mean().reset_index()
+    gasoline_df['period'] = gasoline_df['period'] - timedelta(3)
 
-    gasoline_df_agg['period'] = gasoline_df_agg['period'] - timedelta(3)
+    return gasoline_df
 
-    return gasoline_df_agg
-
-def process_production(prod_df: pd.DataFrame) -> pd.DataFrame:
+def process_production(feature_df: pd.DataFrame) -> pd.DataFrame:
     """
     
     """
-    prod_df_filter = prod_df[prod_df['units'] == 'MBBL']
+    prod_df_filter = feature_df[feature_df['units'] == 'MBBL']
     df_prod_sum = prod_df_filter.groupby('period')['value'].sum().reset_index()
 
     df_prod_sum['year_month'] = df_prod_sum['period'].dt.strftime('%Y-%m')
@@ -117,9 +113,20 @@ def process_input_utilization(feature_df: pd.DataFrame) -> pd.DataFrame:
                                 'Midwest (PADD 2)',
                                 'Gulf Coast (PADD 3)',
                                 'Rocky Mountain (PADD 4)',
-                                'West Coast (PADD 5)']
+                                'West Coast (PADD 5)',
+                                'oil_distillation_capacity']
 
     return df_input
+
+@merge_dataframe
+def process_stocks(feature_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    
+    """
+    df_stocks = feature_df.copy()
+    df_stocks = df_stocks.pivot(index='period',columns='process-name',values='value').reset_index()
+
+    return df_stocks
 
 @merge_dataframe
 def process_index(feature_df: pd.DataFrame,
@@ -167,7 +174,7 @@ def monthly_merge(main_df: pd.DataFrame,
     return merge_feature
 
 @merge_dataframe
-def process_wti_price(feature_df: pd.DataFrame) -> pd.DataFrame:
+def process_oil_price(feature_df: pd.DataFrame) -> pd.DataFrame:
 
     weekly_timestamps_df = pd.DataFrame()
     today = date.today().strftime('%Y-%m-%d')
@@ -176,12 +183,12 @@ def process_wti_price(feature_df: pd.DataFrame) -> pd.DataFrame:
                                         end=today,freq='W') - timedelta(days=2)
 
     feature_df_copy = feature_df.copy()
-    feature_df_copy = feature_df_copy[['period','value']]
+    feature_df_copy = feature_df_copy.pivot(index='period',columns='product',values='value')
 
-    feature_df_copy['value'] = feature_df_copy['value'].rolling(window=5).mean()
+    feature_df_copy = feature_df_copy[['EPCBRENT','EPCWTI']].rolling(window=5).mean()
 
     merge_df = weekly_timestamps_df.merge(feature_df_copy, on='period',how='outer')
-    merge_wti = weekly_timestamps_df.merge(merge_df,how='right')
-    merge_wti['value'] = merge_wti['value'].ffill()
+    merge_prices = weekly_timestamps_df.merge(merge_df,how='right')
+    merge_prices = merge_prices.ffill().round(3)
 
-    return merge_wti
+    return merge_prices
