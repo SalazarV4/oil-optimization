@@ -1,0 +1,58 @@
+{
+  "expectations": [
+    {
+      "id": "2736e897-d3e0-4109-825e-98ac0882d0bf",
+      "kwargs": {
+        "column": "area-name",
+        "value_set": [
+          "PADD 1",
+          "PADD 2",
+          "PADD 3",
+          "PADD 4",
+          "PADD 5",
+          "U.S."
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_distinct_values_to_be_in_set"
+    },
+    {
+      "id": "23111449-a9bf-4fec-adb7-791f76d5eb38",
+      "kwargs": {
+        "column": "value",
+        "min_value": 0.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "id": "d27b2414-ff7b-4d15-a5aa-d688b07288a4",
+      "kwargs": {
+        "column": "value"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "6788277d-a738-4bae-bef5-5738dab641a6",
+      "kwargs": {
+        "column": "units",
+        "value_set": [
+          "MBBL/D"
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_distinct_values_to_equal_set"
+    }
+  ],
+  "id": "d2518a58-2e9f-4013-af90-28bd48622f10",
+  "meta": {
+    "great_expectations_version": "1.15.2"
+  },
+  "name": "input_utilization_suite",
+  "notes": null
+}
