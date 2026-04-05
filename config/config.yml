@@ -1,8 +1,2 @@
 data_ingestion:
-  root_dir: data
-  eia_api_endpoint:
-  - 'https://api.eia.gov/v2/crude-oil-imports/data'
-  - 'https://api.eia.gov/v2/petroleum/pri/spt/data'
-  yfinance:
-    ticker: '^GSPE'
-    start_date: '2015-01-01'
+  data_dir: data
